@@ -21,11 +21,11 @@ package com.utils
 		/**浏览选择文件夹
 		 * @param fun 设置带参数回调函数，函数的返回参数为选中的文件
 		 */		
-		public static function browseForDirectory(fun:Function=null):void
+		public static function browseForDirectory(fun:Function=null,titleDescr:String=null):void
 		{
 			try{
 				var file:File=File.desktopDirectory;
-				file.browseForDirectory("Select Directory");
+				file.browseForDirectory(titleDescr?titleDescr:"Select Directory");
 				file.addEventListener(Event.SELECT, directorySelected);
 			}catch (error:Error){
 				trace("Failed:", error.message);

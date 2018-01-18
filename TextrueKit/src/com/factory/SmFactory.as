@@ -5,9 +5,14 @@ package com.factory
 	import com.data.ActionFormatVO;
 	import com.utils.FileUtil;
 	
+	import flash.display.BitmapData;
 	import flash.filesystem.File;
+	import flash.geom.Matrix;
+	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
+	
+	import mx.graphics.codec.PNGEncoder;
 
 	/**
 	 * @time 2018-1-17
@@ -107,9 +112,9 @@ package com.factory
 						var height:int=bytes.readShort();
 						var tx:int=bytes.readShort();
 						var ty:int=bytes.readShort();
-						
-						tx -=400;
-						ty -=300;
+//						
+//						tx -=400;
+//						ty -=300;
 						
 						ws.push(width);
 						hs.push(height);
@@ -161,21 +166,53 @@ package com.factory
 		private var actionNames:Array=["error",'stand','attack','run','skill','hit','death'];
 		public function parseAsset(file:File,vo:ActionFormatVO):void{
 			var bytes:ByteArray=FileUtil.getBytesByFile(file);
+			try{
+				bytes.uncompress();
+				
+			}catch(e:Error){
+				trace(e)
+			}
 			bytes.position=0;
+			
 			var file_format:String=bytes.readUTFBytes(2);
 			var file_name:String=bytes.readUTF();
 			var act:int=bytes.readByte();
 			var dir:int=bytes.readByte();
 			var frames:int=bytes.readByte();
+			
+			var txs:Vector.<int>=vo.txs[dir];
+			var tys:Vector.<int>=vo.tys[dir];
+			var ws:Vector.<uint>=vo.widths[dir];
+			var hs:Vector.<uint>=vo.heights[dir];
+			
 			for (var i:int = 0; i < frames; i++) 
 			{
 				var byteLen:int=bytes.readInt();
-				var fileBytes:ByteArray =new ByteArray();
-				bytes.readBytes(fileBytes,0,byteLen);
-				var path:String=getOutputPath()+"/"+vo.id+"/"+vo.actionName+"/"+dir+"/"+i+"."+file_format;
-				FileUtil.saveBytesFile(path,fileBytes);
+				
+				var bmdBytes:ByteArray =new ByteArray();
+				bytes.readBytes(bmdBytes,0,byteLen);
+				
+				var w:int=bmdBytes.readShort();
+				var h:int=bmdBytes.readShort();
+				var pixels:ByteArray =new ByteArray();
+				bmdBytes.readBytes(pixels);
+				
+//				var bmd:BitmapData =new BitmapData(w,h);
+//				bmd.setPixels(bmd.rect,pixels);
+				
+				
+				if(true){
+					var bigBmd:BitmapData =new BitmapData(800,600,true,0x00000000);
+					bigBmd.setPixels(new Rectangle(txs[i]-w,tys[i]-2*h,w,h),pixels);
+					var png:PNGEncoder=new PNGEncoder();
+					var path:String=getOutputPath()+"/"+vo.id+"/"+vo.actionName+"/"+dir+"/"+i+".png";
+					FileUtil.saveBytesFile(path,png.encode(bigBmd));
+				}
+				
+				
 			}
 		}
+		
 		
 	}
 }

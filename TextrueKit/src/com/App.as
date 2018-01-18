@@ -23,7 +23,7 @@ private function checkCfg():void{
 	var cfgFile:File =new File(path);
 	_cfgXml=new XML(FileUtil.readByUTFBytes(cfgFile));	
 		path=_cfgXml[GameConst.ORIGIN_DIR];
-		checkPath(path,browseOrgDirComplete);
+		checkPath(path,browseOrgDirComplete,"资源目录：");
 }
 
 
@@ -45,7 +45,7 @@ private function checkCfg():void{
 /**
  * 检测路径是否正确
  */
-private function checkPath(path:String,backFun:Function):void{
+private function checkPath(path:String,backFun:Function,title:String=null):void{
 	var loadFile:Boolean=false;
 	if(path&&path.length>0){
 		if(path.indexOf(".")==0){
@@ -62,7 +62,7 @@ private function checkPath(path:String,backFun:Function):void{
 		loadFile=true;
 	}
 	if(loadFile){
-		FileUtil.browseForDirectory(browseComplete);
+		FileUtil.browseForDirectory(browseComplete,title);
 	}
 	
 	function browseComplete(file:File):void{
@@ -97,5 +97,5 @@ private function browseOutputDirComplete(file:File,savebool:Boolean=true):void{
 }
 
 private function checkOutput():void{
-	checkPath(_cfgXml[GameConst.OUTPUT_DIR],browseOutputDirComplete);
+	checkPath(_cfgXml[GameConst.OUTPUT_DIR],browseOutputDirComplete,"输出目录：");
 }
